@@ -5,9 +5,9 @@ import (
 	"gorm.io/gorm"
 )
 
-type GeoEntity struct{
-    gorm.Model
-    Entity
-    //srid4326 point
-    gormGIS.GeoPoint `gorm:"type:geometry"`
+type GeoEntity struct {
+	gorm.Model
+	Entity
+	//srid4326 point
+	gormGIS.GeoPoint `gorm:"type:geometry"`
 }
