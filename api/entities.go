@@ -10,7 +10,7 @@ func (app *AppAPI) entities() {
 		// fetch all entities
 		// add pagination
 		// add query parameters
-		var entities []databaseTypes.Entity
+		var entities []databaseTypes.GeoEntity
 		app.Db.Find(&entities)
 		ctx.JSON(200, entities)
 
