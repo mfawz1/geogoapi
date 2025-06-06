@@ -13,9 +13,10 @@ import (
 func main() {
 	//init app
 	_, testMode := os.LookupEnv("test_mode")
-	if testMode{
+	if testMode {
 		log.SetOutput(io.Discard)
 	}
+	gin.SetMode(gin.DebugMode)
 	router := gin.Default()
 	app := api.AppAPI{
 		Router: router,

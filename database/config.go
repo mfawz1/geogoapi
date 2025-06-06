@@ -21,7 +21,7 @@ type DBConfig struct {
 
 func loadDatabaseConfig() string {
 	_, testMode := os.LookupEnv("test_mode")
-	if testMode{
+	if testMode {
 		log.SetOutput(io.Discard)
 	}
 

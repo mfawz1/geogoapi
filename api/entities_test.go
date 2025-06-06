@@ -11,17 +11,56 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestEntitesAPI(t *testing.T) {
+func MakeRequest(req *http.Request) *httptest.ResponseRecorder {
 	gin.SetMode(gin.TestMode)
 	app := SetupAPI()
-
 	w := httptest.NewRecorder()
-	req, _ := http.NewRequest("GET", "/entities", nil)
 	app.Router.ServeHTTP(w, req)
-	assert.Equal(t, 200, w.Code)
-	entities := make([]database.GeoEntity, 0)
+	return w
+}
+func TestFetchAllEntities(t *testing.T) {
+	req, _ := http.NewRequest("GET", "/entities", nil)
+	w := MakeRequest(req)
+	assert.Equal(t, http.StatusOK, w.Code)
+	var entities []database.GeoEntity
+	app := SetupAPI()
+	app.Db.Find(&entities)
 	data, _ := json.Marshal(entities)
-	t.Logf("data: %s", string(data))
+	t.Logf("data: %d", len(data))
 	assert.Equal(t, string(data), w.Body.String())
+}
 
+func TestFetchSingleEntity(t *testing.T) {
+	req, _ := http.NewRequest("GET", "/entities/408", nil)
+	w := MakeRequest(req)
+	assert.Equal(t, http.StatusOK, w.Code)
+	var entity database.GeoEntity = database.GeoEntity{
+		ID: 408,
+	}
+	app := SetupAPI()
+	result := app.Db.Find(&entity)
+	if result.RowsAffected == 0{
+		data, _ := json.Marshal(map[string]string{})
+		assert.Equal(t, string(data), w.Body.String())
+		return
+	}
+	data, _ := json.Marshal(entity)
+	assert.Equal(t, string(data), w.Body.String())
+}
+func TestFetchSingleEntityNotFound(t *testing.T) {
+	req, _ := http.NewRequest("GET", "/entities/405", nil)
+	w := MakeRequest(req)
+	assert.Equal(t, http.StatusNotFound, w.Code)
+	var entity database.GeoEntity = database.GeoEntity{
+		ID: 405,
+	}
+	app := SetupAPI()
+	result := app.Db.Find(&entity)
+	if result.RowsAffected == 0{
+		data, _ := json.Marshal(map[string]string{})
+		assert.Equal(t, string(data), w.Body.String())
+		return
+	}
+	data, _ := json.Marshal(entity)
+	assert.Equal(t, string(data), w.Body.String())
 }
