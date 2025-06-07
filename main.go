@@ -2,19 +2,19 @@ package main
 
 import (
 	"io"
-	"log"
 	"os"
-
 	"github.com/gin-gonic/gin"
 	"github.com/mfawz1/geogoapi/api"
 	"github.com/mfawz1/geogoapi/database"
+	"github.com/mfawz1/geogoapi/log"
 )
 
 func main() {
+	log.InitLoggers()
 	//init app
 	_, testMode := os.LookupEnv("test_mode")
 	if testMode {
-		log.SetOutput(io.Discard)
+		log.InfoLog.SetOutput(io.Discard)
 	}
 	gin.SetMode(gin.DebugMode)
 	router := gin.Default()
