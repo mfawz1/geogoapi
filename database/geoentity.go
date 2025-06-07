@@ -1,20 +1,16 @@
 package database
 
 import (
-	"time"
-
-)
-
-
-import (
 	"bytes"
 	"database/sql/driver"
 	"encoding/binary"
 	"encoding/hex"
 	"fmt"
+	"log"
+	"time"
 )
 
-//	GeoPoint implementation copied from and modified to Scan for string not uint8 "github.com/nferruzzi/gormgis"
+// GeoPoint implementation copied from and modified to Scan for string not uint8 "github.com/nferruzzi/gormgis"
 type GeoPoint struct {
 	Lng float64 `json:"lng"`
 	Lat float64 `json:"lat"`
@@ -24,8 +20,12 @@ func (p *GeoPoint) String() string {
 	return fmt.Sprintf("SRID=4326;POINT(%v %v)", p.Lng, p.Lat)
 }
 
-func (p *GeoPoint) Scan(val interface{}) error {
-	b, err := hex.DecodeString(string(val.(string)))
+func (p *GeoPoint) Scan(val any) error {
+	valString, ok := val.(string)
+	if !ok {
+		log.Fatal("Scanning GeoPoint failed")
+	}
+	b, err := hex.DecodeString(valString)
 	if err != nil {
 		return err
 	}
@@ -60,8 +60,9 @@ func (p *GeoPoint) Scan(val interface{}) error {
 func (p GeoPoint) Value() (driver.Value, error) {
 	return p.String(), nil
 }
+
 type GeoEntity struct {
-	ID        uint `gorm:"primarykey" uri:"id" fake:"-"`
+	ID        uint      `gorm:"primarykey" uri:"id" fake:"-"`
 	CreatedAt time.Time `fake:"-"`
 	UpdatedAt time.Time `fake:"-"`
 	Entity

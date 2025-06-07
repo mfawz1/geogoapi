@@ -53,7 +53,17 @@ func SetupAndGetDB() *gorm.DB {
 		log.Fatal("Couldn't connect to db", err)
 		panic("")
 	}
-	db.Exec("create extension if not exists postgis")
+	//creating extension is a superuser priviliege, so this will only check if the extension exists or not
+	var postgisExists bool
+	createExtensionResult := db.Raw("select exists(select 1 from pg_extension where extname = 'postgis')").Scan(&postgisExists)
+	if createExtensionResult.Error != nil{
+		//TODOish
+		//this feels rather restrictive, the extension might exist but the privilege to query this might not? so it's maybe a good idea to disable this?
+		log.Fatal("Error querying for postgis extension\n", createExtensionResult.Error)
+	}
+	if !postgisExists{
+		log.Fatal("Postgis not available on the database")
+	}
 	log.Print("Database connected successfully!")
 	return db
 }
