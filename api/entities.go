@@ -47,8 +47,6 @@ func fetchEntitiesWithLatLngFilter(app *AppAPI) func(*gin.Context) {
 		var entities []database.GeoEntity
 		app.Db.Find(&entities)
 		ctx.JSON(http.StatusOK, entities)
-		return
-
 	}
 }
 func fetcEntitiesWithId(app *AppAPI) func(*gin.Context) {
